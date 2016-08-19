@@ -2,6 +2,14 @@
 from __future__ import absolute_import
 
 import octoprint.plugin
+import pigpio
+import os, system, termios, tty, time
+
+RED_PIN = 17
+GREEN_PIN = 22
+BLUE_PIN = 24
+
+pi = pigpio.pi()
 
 class DisplayProgressPlugin(octoprint.plugin.ProgressPlugin,
                             octoprint.plugin.SettingsPlugin):
@@ -42,6 +50,26 @@ class DisplayProgressPlugin(octoprint.plugin.ProgressPlugin,
 
 	@classmethod
 	def _progress_bar(cls, progress):
+		if progress < 20:
+			pi.set_PWM_dutycycle(RED_PIN, 204)
+			pi.set_PWM_dutycycle(GREEN_PIN, 0)
+			pi.set_PWM_dutycycle(BLUE_PIN, 0)
+		elif progress >= 20 and progress <= 40
+			pi.set_PWM_dutycycle(RED_PIN, 255)
+			pi.set_PWM_dutycycle(GREEN_PIN, 128)
+			pi.set_PWM_dutycycle(BLUE_PIN, 0)
+		elif progress > 40 and progress <= 60
+			pi.set_PWM_dutycycle(RED_PIN, 255)
+			pi.set_PWM_dutycycle(GREEN_PIN, 255)
+			pi.set_PWM_dutycycle(BLUE_PIN, 51)
+		elif progress > 60 and progress <= 80
+			pi.set_PWM_dutycycle(RED_PIN, 51)
+			pi.set_PWM_dutycycle(GREEN_PIN, 51)
+			pi.set_PWM_dutycycle(BLUE_PIN, 255)
+		elif progress > 80 and progress <= 100
+			pi.set_PWM_dutycycle(RED_PIN, 0)
+			pi.set_PWM_dutycycle(GREEN_PIN, 204)
+			pi.set_PWM_dutycycle(BLUE_PIN, 0)			
 		hashes = "#" * int(round(progress / 10))
 		spaces = " " * (10 - len(hashes))
 		return "[{}{}]".format(hashes, spaces)
@@ -56,4 +84,4 @@ def __plugin_load__():
 	__plugin_hooks__ = {
 		"octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
 	}
-
+pi.stop()
